@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Аккаунт</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Мой аккаунт</h2>
+
+<h3>Избранное</h3>
+<div id="favorites"></div>
+
+<h3>История заказов</h3>
+<div id="orders"></div>
+
+<script>
+const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+document.getElementById("favorites").innerHTML =
+  favorites.map(f => `<p>${f.name}</p>`).join("");
+
+document.getElementById("orders").innerHTML =
+  orders.map(o => `<p>Заказ ${o.id} - ${o.date}</p>`).join("");
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Админ-панель</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Админ-панель</h2>
+
+<p>Всего товаров: <span id="count"></span></p>
+
+<script src="js/data.js"></script>
+<script>
+document.getElementById("count").innerText = products.length;
+</script>
+
+</body>
+</html>
