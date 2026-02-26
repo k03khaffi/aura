@@ -1,0 +1,382 @@
+/* css/index.css */
+/* Импортируем те же шрифты и базовые стили, что в style.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
+
+/* Базовые стили (скопированы и немного адаптированы из style.css) */
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #f9f9f9;
+  color: #111;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+nav a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #111;
+  font-weight: 400;
+  transition: opacity 0.3s;
+}
+
+nav a:hover {
+  opacity: 0.6;
+}
+
+/* ── Секция "Новая коллекция" ── */
+section {
+  padding: 40px;
+}
+
+section h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 30px 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Сетка товаров — как в большинстве магазинов */
+#product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Карточка товара */
+.product {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.product:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.product img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info {
+  padding: 16px 20px;
+  text-align: left;
+}
+
+.product h3 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.product .brand {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.product .price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 12px 0;
+}
+
+/* Кнопка на карточке (появляется при наведении или всегда видна) */
+.product .add-to-cart {
+  background: #000;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.25s;
+  opacity: 0.92;
+}
+
+.product .add-to-cart:hover {
+  background: #222;
+  opacity: 1;
+}
+
+/* css/index.css — продолжение/дополнение */
+
+main {
+    padding: 20px 40px 60px;
+  }
+  
+  .hero-section h2 {
+    font-size: 2.1rem;
+    text-align: center;
+    margin: 0 0 2.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #111;
+  }
+  
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 28px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  
+  /* ── Карточка товара на главной ── */
+  .product {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    transition: all 0.28s ease;
+    cursor: pointer;
+  }
+  
+  .product:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+  }
+  
+  .product img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+  }
+  
+  .product .product-info {
+    padding: 16px 20px;
+  }
+  
+  .product h3 {
+    font-size: 1.05rem;
+    margin: 0 0 0.4rem;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  
+  .product .brand {
+    color: #555;
+    font-size: 0.92rem;
+    margin: 0 0 0.7rem;
+  }
+  
+  .product .price {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  /* ── Модальное окно ── */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 960px;
+    width: 92%;
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  
+  .close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 2.2rem;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+  }
+  
+  .close:hover {
+    color: #000;
+  }
+  
+  .modal-body {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    padding: 40px;
+  }
+  
+  .modal-image-wrapper {
+    flex: 0 0 48%;
+  }
+  
+  .modal-image-wrapper img {
+    width: 100%;
+    height: auto;
+    max-height: 580px;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+  
+  .modal-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-info h2 {
+    margin: 0 0 0.8rem;
+    font-size: 1.95rem;
+    font-weight: 600;
+  }
+  
+  .modal-info .brand {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0 0 1.2rem;
+  }
+  
+  .modal-info .price {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #d00;
+    margin: 0 0 1.8rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.4rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+  
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 16px;
+  }
+  
+  .btn-primary, .btn-secondary {
+    flex: 1;
+    padding: 14px 24px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background: #000;
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background: #222;
+  }
+  
+  .btn-secondary {
+    background: #f5f5f5;
+    color: #000;
+    border: 1px solid #ddd;
+  }
+  
+  .btn-secondary:hover {
+    background: #e8e8e8;
+  }
+  
+  /* Мобильная адаптация */
+  @media (max-width: 768px) {
+    .modal-body {
+      flex-direction: column;
+      padding: 24px;
+      gap: 24px;
+    }
+    
+    .modal-image-wrapper {
+      flex: 0 0 auto;
+    }
+    
+    .modal-image-wrapper img {
+      max-height: 420px;
+    }
+  }
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  header {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  nav a {
+    margin-left: 16px;
+    font-size: 15px;
+  }
+  
+  section {
+    padding: 24px 16px;
+  }
+  
+  #product-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  
+  .product img {
+    height: 320px;
+  }
+}
