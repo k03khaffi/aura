@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aura — Новая коллекция</title>
-  <link rel="stylesheet" href="css/style.css">     <!-- общие стили -->
-  <link rel="stylesheet" href="css/index.css">     <!-- стили главной страницы -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
 
@@ -14,8 +14,10 @@
   <nav>
     <a href="catalog.html">Каталог</a>
     <a href="cart.html">Корзина</a>
-    <a href="account.html">Аккаунт</a>
-    <a href="admin.html">Админ</a>
+    
+    <!-- Эти две ссылки теперь без href — клик обрабатываем в JS -->
+    <a href="#" data-protected="account">Аккаунт</a>
+    <a href="#" data-protected="admin">Админ</a>
   </nav>
 </header>
 
@@ -61,5 +63,35 @@
 </div>
 
 <script src="js/main.js"></script>
+
+<script>
+// Защита ссылок "Аккаунт" и "Админ"
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('a[data-protected]').forEach(link => {
+    link.addEventListener("click", function(e) {
+      e.preventDefault(); // предотвращаем обычный переход
+
+      const page = this.getAttribute("data-protected");
+      const isLoggedIn = !!localStorage.getItem("currentUser");
+
+      if (isLoggedIn) {
+        // Пользователь авторизован → идём на нужную страницу
+        if (page === "account") {
+          window.location.href = "account.html";
+        } else if (page === "admin") {
+          window.location.href = "admin.html";
+        }
+      } else {
+        // Не авторизован → запоминаем, куда хотели попасть, и отправляем на вход
+        localStorage.setItem("loginRedirect", page === "account" ? "account.html" : "admin.html");
+        window.location.href = "auth.html";  // или "login.html" — в зависимости от вашего названия
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
 </body>
 </html>

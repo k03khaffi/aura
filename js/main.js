@@ -27,7 +27,7 @@
           <img src="${product.image}">
           <h3>${product.name}</h3>
           <p>${product.brand}</p>
-          <p class="price">${product.price} €</p>
+          <p class="price">${product.price} руб.</p>
         </div>
       `;
     });
@@ -42,7 +42,7 @@
   function applyFilters() {
     const category = document.getElementById("categoryFilter")?.value || "";
     const min = parseInt(document.getElementById("minPrice")?.value) || 0;
-    const max = parseInt(document.getElementById("maxPrice")?.value) || 9999;
+    const max = parseInt(document.getElementById("maxPrice")?.value) || 999999;
 
     const filtered = productsData.filter(p =>
       (category === "" || p.category === category) &&
@@ -86,16 +86,26 @@
 
   // Корзина
   function addToCart(product, size, color) {
+    const currentUser = localStorage.getItem("currentUser");
+  
+    if (!currentUser) {
+      // Сохраняем страницу, на которую хотим вернуться после входа
+      localStorage.setItem("loginRedirect", window.location.href);
+      window.location.href = "auth.html";
+      return;
+    }
+  
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
+  
     cart.push({
       ...product,
       size,
-      color
+      color,
+      userEmail: JSON.parse(currentUser).email  // опционально — привязка к пользователю
     });
-
+  
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Добавлено в корзину");
+    alert("Товар добавлен в корзину");
     closeModal();
   }
 

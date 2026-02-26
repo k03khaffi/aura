@@ -1,22 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Корзина</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aura — Корзина</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
   <h1>Aura</h1>
+  <nav>
+    <a href="index.html">Главная</a>
+    <a href="catalog.html">Каталог</a>
+    <a href="account.html">Аккаунт</a>
+  </nav>
 </header>
 
-<h2 style="padding:20px;">Корзина</h2>
+<main class="cart-page">
+  <div class="cart-container">
+    <h1>Корзина</h1>
 
-<div id="cart-items"></div>
-<h3 style="padding:20px;">Итого: <span id="total"></span></h3>
+    <div id="cart-items" class="cart-items"></div>
 
-<a href="checkout.html"><button>Перейти к оплате</button></a>
+    <div class="cart-summary" id="cart-summary" style="display:none;">
+      <div class="summary-row">
+        <span>Итого товаров:</span>
+        <span id="items-count">0</span>
+      </div>
+      <div class="summary-row total">
+        <span>К оплате:</span>
+        <span id="total">0 €</span>
+      </div>
+      <a href="checkout.html" class="btn-checkout">Перейти к оформлению</a>
+    </div>
+
+    <div id="empty-cart" class="empty-cart-message" style="display:none;">
+      <p>Ваша корзина пуста</p>
+      <a href="catalog.html" class="btn-to-catalog">Перейти в каталог</a>
+    </div>
+  </div>
+</main>
 
 <script src="js/main.js"></script>
+<script>
+// =============================================
+//   Логика корзины (можно позже вынести в отдельный файл)
+// =============================================
+
+function renderCart() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const itemsContainer = document.getElementById("cart-items");
+  const summary = document.getElementById("cart-summary");
+  const emptyMessage = document.getElementById("empty-cart");
+  const totalEl = document.getElementById("total");
+  const countEl = document.getElementById("items-count");
+
+  if (cart.length === 0) {
+    itemsContainer.innerHTML = "";
+    summary.style.display = "none";
+    emptyMessage.style.display = "block";
+    return;
+  }
+
+  emptyMessage.style.display = "none";
+  summary.style.display = "block";
+
+  let html = "";
+  let total = 0;
+  let count = cart.length;
+
+  cart.forEach((item, index) => {
+    total += Number(item.price) || 0;
+
+    html += `
+      <div class="cart-item">
+        <div class="item-image">
+          <img src="${item.image}" alt="${item.name}">
+        </div>
+        <div class="item-info">
+          <h3>${item.name}</h3>
+          <p class="brand">${item.brand}</p>
+          <p class="variant">Размер: <strong>${item.size}</strong> • Цвет: <strong>${item.color}</strong></p>
+          <p class="price">${item.price} руб.</p>
+        </div>
+        <button class="btn-remove" onclick="removeFromCart(${index})" title="Удалить товар">×</button>
+      </div>
+    `;
+  });
+
+  itemsContainer.innerHTML = html;
+  totalEl.textContent = total.toFixed(2) + " руб.";
+  countEl.textContent = count;
+}
+
+function removeFromCart(index) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.splice(index, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+  // Можно добавить уведомление
+  // alert("Товар удалён из корзины");
+}
+
+// Инициализация
+document.addEventListener("DOMContentLoaded", renderCart);
+</script>
 </body>
 </html>
