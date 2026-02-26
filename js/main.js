@@ -1,7 +1,7 @@
-// Вся логика в замкнутой области видимости
+
 (function () {
 
-  let productsData = []; // ← больше НЕ глобальная переменная
+  let productsData = []; 
 
   // Загрузка JSON
   async function loadProducts() {
@@ -32,7 +32,6 @@
       `;
     });
 
-    // Навешиваем обработчики после рендера
     document.querySelectorAll(".product").forEach(card => {
       card.addEventListener("click", () => {
         openModal(Number(card.dataset.id));
@@ -40,7 +39,6 @@
     });
   }
 
-  // Фильтры
   function applyFilters() {
     const category = document.getElementById("categoryFilter")?.value || "";
     const min = parseInt(document.getElementById("minPrice")?.value) || 0;
@@ -113,11 +111,9 @@
     alert("Добавлено в избранное");
   }
 
-  // Делаем фильтр глобально доступным (если кнопка в HTML вызывает onclick)
   window.applyFilters = applyFilters;
   window.closeModal = closeModal;
 
-  // Запуск
   document.addEventListener("DOMContentLoaded", loadProducts);
 
 })();
