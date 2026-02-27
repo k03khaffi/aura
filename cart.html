@@ -44,9 +44,6 @@
 
 <script src="js/main.js"></script>
 <script>
-// =============================================
-//   Логика корзины (можно позже вынести в отдельный файл)
-// =============================================
 
 function renderCart() {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -99,8 +96,6 @@ function removeFromCart(index) {
   cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
-  // Можно добавить уведомление
-  // alert("Товар удалён из корзины");
 }
 
 // Инициализация
