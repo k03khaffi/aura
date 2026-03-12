@@ -5,15 +5,7 @@
   // Загрузка JSON — несколько вариантов пути, раскомментируй нужный
   async function loadProducts() {
     try {
-      // Вариант 1 — самый надёжный для GitHub Pages (от корня сайта)
-      const response = await fetch("/products.json");
-
-      // Вариант 2 — если файл в той же папке, что и html
-      // const response = await fetch("./products.json");
-
-      // Вариант 3 — если файл в папке js или data
-      // const response = await fetch("/js/products.json");
-      // const response = await fetch("/data/products.json");
+      const response = await fetch("./products.json");
 
       if (!response.ok) {
         throw new Error(`HTTP ошибка! статус: ${response.status}`);
