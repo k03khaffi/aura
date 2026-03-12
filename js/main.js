@@ -6,7 +6,7 @@
   // Загрузка JSON
   async function loadProducts() {
     try {
-      const response = await fetch("/products.json");
+      const response = await fetch("./products.json");
       productsData = await response.json();
       renderProducts(productsData);
     } catch (error) {
