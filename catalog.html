@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Каталог — Aura</title>
+  <title>Aura — Мой аккаунт</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,68 +12,202 @@
   <h1>Aura</h1>
   <nav>
     <a href="index.html">Главная</a>
+    <a href="catalog.html">Каталог</a>
     <a href="cart.html">Корзина</a>
-    <a href="account.html">Аккаунт</a>
   </nav>
 </header>
 
-<main class="catalog-page">
-  <div class="container">
-    <h1>Каталог</h1>
-
-    <div class="filters">
-      <select id="categoryFilter">
-        <option value="">Все категории</option>
-        <option value="Жакеты">Жакеты</option>
-        <option value="Худи">Худи</option>
-        <option value="Пальто">Пальто</option>
-        <!-- добавьте остальные категории из products.json, если хотите -->
-      </select>
-
-      <input type="number" id="minPrice" placeholder="Цена от" min="0">
-      <input type="number" id="maxPrice" placeholder="Цена до" min="0">
-
-      <button onclick="applyFilters()">Применить</button>
+<main class="account-page">
+  <div class="account-container">
+    <div class="account-header">
+      <h1>Мой аккаунт</h1>
+      <button id="logout-btn" class="btn-logout">Выйти</button>
     </div>
 
-    <div id="product-list" class="products-grid"></div>
+    <section class="account-section">
+      <h2>Избранное</h2>
+      <div id="favorites" class="favorites-grid"></div>
+    </section>
+
+    <section class="account-section">
+      <h2>История заказов</h2>
+      <div id="orders" class="orders-list"></div>
+    </section>
+
+    <!-- Пустые состояния -->
+    <div id="no-favorites" class="empty-state" style="display:none;">
+      <p>У вас пока нет избранных товаров</p>
+      <a href="catalog.html" class="btn-to-catalog">Перейти в каталог</a>
+    </div>
+
+    <div id="no-orders" class="empty-state" style="display:none;">
+      <p>У вас пока нет заказов</p>
+      <a href="catalog.html" class="btn-to-catalog">Начать покупки</a>
+    </div>
   </div>
 </main>
 
-<!-- Модальное окно -->
-<div id="productModal" class="modal">
+<!-- Модальное окно для просмотра товара из избранного -->
+<div id="favoriteModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <button class="close" onclick="closeModal()" aria-label="Закрыть">×</button>
+    <button class="close" onclick="closeFavoriteModal()" aria-label="Закрыть">×</button>
 
     <div class="modal-body">
-      <div class="modal-left">
-        <img id="modalImage" alt="Товар">
+      <div class="modal-image-wrapper">
+        <img id="favModalImage" alt="">
       </div>
 
-      <div class="modal-right">
-        <h2 id="modalName"></h2>
-        <p id="modalBrand" class="brand"></p>
-        <p id="modalPrice" class="price"></p>
+      <div class="modal-info">
+        <h2 id="favModalName"></h2>
+        <p id="favModalBrand" class="brand"></p>
+        <p id="favModalPrice" class="price"></p>
 
-        <div class="form-group">
-          <label for="modalSize">Размер</label>
-          <select id="modalSize"></select>
-        </div>
+        <p><strong>Выбранный размер:</strong> <span id="favModalSize"></span></p>
+        <p><strong>Выбранный цвет:</strong> <span id="favModalColor"></span></p>
 
-        <div class="form-group">
-          <label for="modalColor">Цвет</label>
-          <select id="modalColor"></select>
-        </div>
-
-        <div class="modal-buttons">
-          <button id="modalCartBtn" class="btn-add-to-cart">В корзину</button>
-          <button id="modalFavBtn" class="btn-add-to-fav">В избранное</button>
+        <div class="modal-actions" style="margin-top: 2rem;">
+          <button id="favToCartBtn" class="btn-primary">Добавить в корзину</button>
+          <button id="favRemoveBtn" class="btn-danger">Удалить из избранного</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="js/main.js"></script>
+<script>
+// =============================================
+//   Логика страницы аккаунта
+// =============================================
+
+let currentFavoriteIndex = -1; // для отслеживания, какой товар открыт в модалке
+
+function renderAccount() {
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const orders    = JSON.parse(localStorage.getItem("orders"))   || [];
+  const currentUser = localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    window.location.href = "auth.html";
+    return;
+  }
+
+  const favContainer   = document.getElementById("favorites");
+  const ordersContainer = document.getElementById("orders");
+  const noFav   = document.getElementById("no-favorites");
+  const noOrders = document.getElementById("no-orders");
+
+  // Избранное
+  if (favorites.length === 0) {
+    favContainer.innerHTML = "";
+    noFav.style.display = "block";
+  } else {
+    noFav.style.display = "none";
+    favContainer.innerHTML = favorites.map((item, index) => `
+      <div class="favorite-item">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-info">
+          <h4>${item.name}</h4>
+          <p class="brand">${item.brand}</p>
+          <p class="price">${item.price} ₽</p>
+          <p class="selected-variant">
+            <small>Размер: ${item.size || "—"} • Цвет: ${item.color || "—"}</small>
+          </p>
+          <div class="favorite-actions">
+            <button class="btn-view" onclick="openFavoriteModal(${index})">Посмотреть</button>
+            <button class="btn-remove-fav" onclick="removeFromFavorites(${index})">Удалить</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // Заказы (без изменений)
+  if (orders.length === 0) {
+    ordersContainer.innerHTML = "";
+    noOrders.style.display = "block";
+  } else {
+    noOrders.style.display = "none";
+    ordersContainer.innerHTML = orders.map(order => `
+      <div class="order-item">
+        <div class="order-header">
+          <span class="order-id">Заказ №${order.id || "—"}</span>
+          <span class="order-date">${order.date || "—"}</span>
+        </div>
+        <p class="order-status">${order.status || "Обработан"}</p>
+        <p class="order-total">Сумма: <strong>${order.total || "—"} ₽</strong></p>
+      </div>
+    `).join("");
+  }
+}
+
+function openFavoriteModal(index) {
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const item = favorites[index];
+  if (!item) return;
+
+  currentFavoriteIndex = index;
+
+  document.getElementById("favModalImage").src = item.image;
+  document.getElementById("favModalImage").alt = item.name;
+  document.getElementById("favModalName").textContent = item.name;
+  document.getElementById("favModalBrand").textContent = item.brand;
+  document.getElementById("favModalPrice").textContent = `${item.price} ₽`;
+  document.getElementById("favModalSize").textContent = item.size || "Не выбран";
+  document.getElementById("favModalColor").textContent = item.color || "Не выбран";
+
+  // Кнопки
+  document.getElementById("favToCartBtn").onclick = () => addToCartFromFavorites(item);
+  document.getElementById("favRemoveBtn").onclick = () => {
+    removeFromFavorites(index);
+    closeFavoriteModal();
+  };
+
+  document.getElementById("favoriteModal").style.display = "block";
+}
+
+function closeFavoriteModal() {
+  document.getElementById("favoriteModal").style.display = "none";
+  currentFavoriteIndex = -1;
+}
+
+function addToCartFromFavorites(item) {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({
+    ...item,
+    // размер и цвет уже сохранены в объекте избранного
+  });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("Товар добавлен в корзину!");
+  // можно закрыть модалку
+  // closeFavoriteModal();
+}
+
+function removeFromFavorites(index) {
+  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  if (confirm("Удалить товар из избранного?")) {
+    favorites.splice(index, 1);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    renderAccount(); // перерисовываем список
+  }
+}
+
+function logout() {
+  if (confirm("Вы действительно хотите выйти?")) {
+    localStorage.removeItem("currentUser");
+    window.location.href = "index.html";
+  }
+}
+
+// Закрытие модалки по клику вне контента
+document.getElementById("favoriteModal")?.addEventListener("click", e => {
+  if (e.target === document.getElementById("favoriteModal")) {
+    closeFavoriteModal();
+  }
+});
+
+// События
+document.getElementById("logout-btn")?.addEventListener("click", logout);
+document.addEventListener("DOMContentLoaded", renderAccount);
+</script>
 </body>
 </html>

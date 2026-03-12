@@ -929,3 +929,44 @@ input, select {
     border-radius: 8px;
     color: #856404;
   }
+
+  .favorite-item .selected-variant {
+    color: #555;
+    font-size: 0.9rem;
+    margin: 8px 0 12px;
+  }
+  
+  .favorite-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  
+  .btn-view {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .btn-remove-fav {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .btn-danger {
+    background: #e74c3c !important;
+    color: white !important;
+  }
+  
+  .btn-danger:hover {
+    background: #c0392b !important;
+  }
