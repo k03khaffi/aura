@@ -2,7 +2,7 @@
 
   let productsData = []; 
 
-  // Загрузка JSON — несколько вариантов пути, раскомментируй нужный
+
   async function loadProducts() {
     try {
       const response = await fetch("./products.json");
