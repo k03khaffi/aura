@@ -1,33 +1,65 @@
-
 (function () {
 
   let productsData = []; 
 
-  // Загрузка JSON
+  // Загрузка JSON — несколько вариантов пути, раскомментируй нужный
   async function loadProducts() {
     try {
-      const response = await fetch("./products.json");
+      // Вариант 1 — самый надёжный для GitHub Pages (от корня сайта)
+      const response = await fetch("/products.json");
+
+      // Вариант 2 — если файл в той же папке, что и html
+      // const response = await fetch("./products.json");
+
+      // Вариант 3 — если файл в папке js или data
+      // const response = await fetch("/js/products.json");
+      // const response = await fetch("/data/products.json");
+
+      if (!response.ok) {
+        throw new Error(`HTTP ошибка! статус: ${response.status}`);
+      }
+
       productsData = await response.json();
+      console.log("Товары успешно загружены:", productsData.length, "шт.");
+
       renderProducts(productsData);
     } catch (error) {
       console.error("Ошибка загрузки товаров:", error);
+      // Показываем пользователю сообщение об ошибке (опционально)
+      const container = document.getElementById("product-list");
+      if (container) {
+        container.innerHTML = `<p style="text-align:center; color:#c00; padding:40px;">
+          Не удалось загрузить каталог товаров.<br>
+          Проверьте консоль браузера (F12) для подробностей.
+        </p>`;
+      }
     }
   }
 
   // Рендер товаров
   function renderProducts(list) {
     const container = document.getElementById("product-list");
-    if (!container) return;
+    if (!container) {
+      console.warn("Контейнер #product-list не найден на странице");
+      return;
+    }
 
     container.innerHTML = "";
+
+    if (list.length === 0) {
+      container.innerHTML = `<p style="text-align:center; padding:40px; color:#777;">
+        Нет товаров, соответствующих фильтру
+      </p>`;
+      return;
+    }
 
     list.forEach(product => {
       container.innerHTML += `
         <div class="product" data-id="${product.id}">
-          <img src="${product.image}">
+          <img src="${product.image}" alt="${product.name}" loading="lazy">
           <h3>${product.name}</h3>
           <p>${product.brand}</p>
-          <p class="price">${product.price} руб.</p>
+          <p class="price">${product.price} ₽</p>
         </div>
       `;
     });
@@ -56,56 +88,74 @@
   // Модальное окно
   function openModal(id) {
     const product = productsData.find(p => p.id === id);
-    if (!product) return;
+    if (!product) {
+      console.warn("Товар с id", id, "не найден");
+      return;
+    }
 
-    document.getElementById("modalImage").src = product.image;
-    document.getElementById("modalName").innerText = product.name;
-    document.getElementById("modalBrand").innerText = product.brand;
-    document.getElementById("modalPrice").innerText = product.price + " €";
+    const modalImage   = document.getElementById("modalImage");
+    const modalName    = document.getElementById("modalName");
+    const modalBrand   = document.getElementById("modalBrand");
+    const modalPrice   = document.getElementById("modalPrice");
+    const modalSize    = document.getElementById("modalSize");
+    const modalColor   = document.getElementById("modalColor");
+    const modalCartBtn = document.getElementById("modalCartBtn");
+    const modalFavBtn  = document.getElementById("modalFavBtn");
 
-    const sizeSelect = document.getElementById("modalSize");
-    const colorSelect = document.getElementById("modalColor");
+    if (modalImage)   modalImage.src = product.image;
+    if (modalName)    modalName.innerText = product.name;
+    if (modalBrand)   modalBrand.innerText = product.brand;
+    if (modalPrice)   modalPrice.innerText = product.price + " ₽";
 
-    sizeSelect.innerHTML = product.sizes.map(s => `<option>${s}</option>`).join("");
-    colorSelect.innerHTML = product.colors.map(c => `<option>${c}</option>`).join("");
+    if (modalSize && product.sizes) {
+      modalSize.innerHTML = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+    }
 
-    document.getElementById("modalCartBtn").onclick = () => {
-      addToCart(product, sizeSelect.value, colorSelect.value);
-    };
+    if (modalColor && product.colors) {
+      modalColor.innerHTML = product.colors.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
 
-    document.getElementById("modalFavBtn").onclick = () => {
-      addToFavorites(product);
-    };
+    if (modalCartBtn) {
+      modalCartBtn.onclick = () => {
+        addToCart(product, modalSize?.value || "—", modalColor?.value || "—");
+      };
+    }
 
-    document.getElementById("productModal").style.display = "block";
+    if (modalFavBtn) {
+      modalFavBtn.onclick = () => addToFavorites(product);
+    }
+
+    const modal = document.getElementById("productModal");
+    if (modal) modal.style.display = "block";
   }
 
   function closeModal() {
-    document.getElementById("productModal").style.display = "none";
+    const modal = document.getElementById("productModal");
+    if (modal) modal.style.display = "none";
   }
 
   // Корзина
   function addToCart(product, size, color) {
     const currentUser = localStorage.getItem("currentUser");
-  
+
     if (!currentUser) {
-      // Сохраняем страницу, на которую хотим вернуться после входа
       localStorage.setItem("loginRedirect", window.location.href);
       window.location.href = "auth.html";
       return;
     }
-  
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  
+
     cart.push({
       ...product,
       size,
       color,
-      userEmail: JSON.parse(currentUser).email  // опционально — привязка к пользователю
+      addedAt: new Date().toISOString(),
+      userEmail: JSON.parse(currentUser).email
     });
-  
+
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Товар добавлен в корзину");
+    alert("Товар добавлен в корзину!");
     closeModal();
   }
 
@@ -113,17 +163,20 @@
   function addToFavorites(product) {
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-    if (!favorites.find(f => f.id === product.id)) {
-      favorites.push(product);
+    if (!favorites.some(f => f.id === product.id)) {
+      favorites.push({ ...product });
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      alert("Добавлено в избранное");
+    } else {
+      alert("Товар уже в избранном");
     }
-
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-    alert("Добавлено в избранное");
   }
 
+  // Глобальные функции для onclick в HTML
   window.applyFilters = applyFilters;
-  window.closeModal = closeModal;
+  window.closeModal   = closeModal;
 
+  // Старт
   document.addEventListener("DOMContentLoaded", loadProducts);
 
 })();
